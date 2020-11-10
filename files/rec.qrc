@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="redc">
+    <file>lib/tuse.png</file>
+    <file>lib/exit - Copy.png</file>
+    <file>lib/pie chart.gif</file>
+    <file>lib/gifloader.gif</file>
+  </qresource>
+</RCC>

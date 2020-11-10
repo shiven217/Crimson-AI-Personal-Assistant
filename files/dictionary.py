@@ -6,7 +6,7 @@ import speech_recognition  as sr
 data = json.load(open('data.json'))
 engine = pyttsx3.init()
 voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[0].id)
+engine.setProperty('voice', voices[1].id)
 
 
 def speak(audio):

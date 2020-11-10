@@ -9,15 +9,16 @@ import random
 from files.dictionary import translate
 from files.news  import speak_news
 from files.audiobook import playaudiobook
+import subprocess
 
 
 speech = sr.Recognizer()
 engine = pyttsx3.init()
 
 voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[2].id)
-rate=engine.getProperty('rate')
-engine.setProperty('rate',190)
+engine.setProperty('voice', voices[1].id)
+
+
 
 
 greet_dict = {'Hello': 'Hello', 'Hi': 'Hi'}
@@ -25,9 +26,10 @@ open_launch_dict = {'open': 'open', 'launch': 'launch'}
 social_media_dict = {'facebook': 'www.facebook.com', 'twitter': 'www.twitter.com', 'youtube': 'www.youtube.com'}
 google_search_dict = {'what': 'what', 'who': 'who', 'why': 'why', 'which': 'which', 'where': 'where'}
 
+
 # audio_lists
 greetings = ['hello']
-mp3_listening_problem = ['i am unable to get you.Please say it again','Sorry i am unable to get You']
+mp3_listening_problem = ['i am unable to get you Please say it again','Sorry i am unable to get You']
 processing_audio=['sure sir','ok sir','got it sir']
 thanks_audio=["it's been a great time with you. i am always here to help you"]
 bye_audio=['bye sir!.have  a great time','see you soon sir','i am always happy to help you']
@@ -38,43 +40,29 @@ def speak(audio):
 
 error = 0
 
-def read_voice():
-    voice_text = ''
-    global error
-    print('Listening....')
-    try:
-        with sr.Microphone() as source:
-            speech.pause_threshold = 1
-            speech.energy_threshold = 494
-            speech.adjust_for_ambient_noise(source, duration=1.5)
-            audio = speech.listen(source)
-            voice_text = speech.recognize_google(audio,language='en-in')
-    except sr.UnknownValueError:
-        if error == 0:
-            # playsound(mp3_listening_problem)
-            print('problem')
-            speak(mp3_listening_problem[random.randint(0,2)])
-            error += 1
-        elif error == 1:
-            print('struggling')
-            # playsound(mp3_struggling)
-            speak(mp3_listening_problem[random.randint(0,2)])
-            error += 1
-    except sr.WaitTimeoutError:
-        if error == 0:
-            # playsound(mp3_listening_problem)
-            print('problem')
-            speak(mp3_listening_problem[random.randint(0, 2)])
-            error += 1
-        elif error == 1:
-            print('struggling')
-            # playsound(mp3_struggling)
-            speak(mp3_listening_problem[random.randint(0, 2)])
-            error += 1
-    except sr.RequestError:
-        print('network error')
-    return voice_text
 
+def read_voice():
+    text = ''
+    R = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening..")
+        audio = R.listen(source)
+    try:
+        print("Recognizing..")
+        text = R.recognize_google(audio, language='en-in')
+    except Exception:
+        speak("Sorry Speak Again")
+        return "None"
+    text = text.lower()
+    return text
+
+
+def note(text):
+    date=datetime.datetime.now()
+    file_name=str(date).replace(":","-")+"-note.txt"
+    with open(file_name,"w") as f:
+        f.write(text)
+    subprocess.Popen(["notepad.exe",file_name])
 
 def is_valid_note(greet_dict, voice_note):
     for key, value in greet_dict.items():
@@ -114,10 +102,11 @@ def wish_me():
 if __name__ == "__main__":
     wish_me()
     # playsound('crimson voice/hii_i_m_crimson.mp3')
-    speak("hii. I am Dizzy an Artificial Personal Assistant")
+    speak("hii.. I am Dizzy an Artificial Personal Assistant")
     speak("how can i help you")
+
     while True:
-        voice_note = read_voice().lower()
+        voice_note = read_voice()
         print('cmd:{}'.format(voice_note))
         if is_valid_note(greet_dict, voice_note):
             print('In open...')
@@ -146,7 +135,7 @@ if __name__ == "__main__":
                 ctypes.windll.user32.LockWorkStation()
 
         elif "play random song" in voice_note or "play random music " in voice_note or "play some music " in voice_note:
-            music_dir="D:\\mobile\\favourite"
+            music_dir="D:\\Songs\\favourite"
             songs=os.listdir(music_dir)
             leng=int(len(songs))
             speak("Playing Music ... ")
@@ -154,7 +143,9 @@ if __name__ == "__main__":
 
         elif "play song" in voice_note or "play some music " in voice_note:
             speak("Which song do you want to play sir ?")
-            kt.playonyt(voice_note)
+            music=read_voice()
+            speak("Playing Music ... ")
+            kt.playonyt(music)
 
         elif "today news " in voice_note or "news headlines" in voice_note or "news" in voice_note:
             speak(processing_audio[random.randint(0,len(processing_audio)-1)])
@@ -162,10 +153,18 @@ if __name__ == "__main__":
 
         elif 'dictionary' in voice_note:
             speak('What you want to search in your intelligent dictionary?')
-            translate(voice_note)
+            element=read_voice()
+            translate(element)
 
         elif "play some audio book for me" in voice_note:
             playaudiobook()
+
+        elif "make a note" in voice_note or "write this down" in voice_note or "write this to notes" in voice_note:
+            speak("What would you like me to write down ?")
+            note_text=read_voice()
+            note(note_text)
+            speak("Note successfully created")
+
 
         elif 'thank you' in voice_note:
             speak(thanks_audio)
