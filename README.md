@@ -11,7 +11,7 @@ It can perform these tasks just with the voice command.
 I have Used Python for programming  and PyQt5 for the User Interface for this Project.
 
 
-#Installing Crimson-AI-Personal_Assistant
+# Installing Crimson-AI-Personal_Assistant<br>
 
 1.Clone/Download the Zip file of this project<br>
 2.Unzip it<br>
